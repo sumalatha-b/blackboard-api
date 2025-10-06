@@ -1,0 +1,10 @@
+%dw 2.0
+
+type auto_6c13b378_ccda_4d43_a853_bbb228e01973_Output_Variables_token = {-
+  access_token: String, 
+  token_type: String, 
+  expires_in: Number, 
+  scope: String, 
+  _?: Any
+-}
+

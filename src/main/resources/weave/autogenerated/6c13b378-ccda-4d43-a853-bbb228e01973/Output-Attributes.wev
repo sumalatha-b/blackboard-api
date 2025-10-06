@@ -1,0 +1,27 @@
+%dw 2.0
+
+type auto_6c13b378_ccda_4d43_a853_bbb228e01973_Output_Attributes = {|
+  clientCertificate?: {|
+    publicKey?: {|  |}, 
+    "type"?: String, 
+    encoded?: Binary
+  |}, 
+  headers: {|  |}, 
+  listenerPath: String, 
+  method: String, 
+  queryParams: {| fields?: String |}, 
+  queryString: String, 
+  relativePath: String, 
+  remoteAddress: String, 
+  requestPath: String, 
+  requestUri: String, 
+  scheme: String, 
+  uriParams: {|
+    categoryType: String, 
+    categoryId: String, 
+    courseId: String
+  |}, 
+  version: String, 
+  localAddress: String
+|}
+
