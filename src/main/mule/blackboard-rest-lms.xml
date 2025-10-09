@@ -329,7 +329,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="4f3d4170-b68e-4a35-81b2-e3033dd89c1c" name="blackboard-token-subFlow" />
-		<blackboard-rest-lms:get-v1-courses-course-id-children-child-course-id doc:name="Get Course Child" doc:id="b1f9d50e-148d-462a-872c-507e54e5a800" config-ref="Blackboard_Rest_Lms_Config" courseIdUriParam="#[vars.courseId]" childCourseIdUriParam="#[vars.childCourseId]"/>
+        <blackboard-rest-lms:get-v1-courses-course-id-children-child-course-id doc:name="Get Course Child" doc:id="b1f9d50e-148d-462a-872c-507e54e5a800" config-ref="Blackboard_Rest_Lms_Config" courseIdUriParam="#[vars.courseId]" childCourseIdUriParam="#[vars.childCourseId]" />
     </flow>
     <flow name="get:\v1\courses\(courseId)\gradebook\categories:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">

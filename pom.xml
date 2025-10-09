@@ -64,7 +64,7 @@
 		<dependency>
 			<groupId>4f77fae5-8c82-4374-8d34-eb141c2786b9</groupId>
 			<artifactId>blackboard-rest-lms</artifactId>
-			<version>1.0.7-BETA</version>
+			<version>1.0.8-BETA</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 	</dependencies>
