@@ -1,45 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:blackboard-access-token="http://www.mulesoft.org/schema/mule/blackboard-access-token" xmlns:blackboard-rest-lms="http://www.mulesoft.org/schema/mule/blackboard-rest-lms" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd  http://www.mulesoft.org/schema/mule/blackboard-rest-lms http://www.mulesoft.org/schema/mule/blackboard-rest-lms/current/mule-blackboard-rest-lms.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/blackboard-access-token http://www.mulesoft.org/schema/mule/blackboard-access-token/current/mule-blackboard-access-token.xsd">
-    <http:listener-config name="blackboard-rest-lms-httpListenerConfig">
-        <http:listener-connection host="${https.host}" port="${https.port}" protocol="HTTPS">
-            <tls:context>
-                <tls:key-store type="jks" path="Client-Keystore.jks" keyPassword="Mule12345" password="Mule12345" />
-            </tls:context>
-        </http:listener-connection>
-    </http:listener-config>
-    <apikit:config name="blackboard-rest-lms-config" api="blackboard-rest-lms.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
-    <configuration doc:name="Configuration" doc:id="e9343320-86ac-45a1-8e2f-c03cc64bf8ad" defaultErrorHandler-ref="Global-Error-Handler" />
-    <configuration-properties doc:name="Configuration properties" doc:id="47231dc5-f5cd-43de-b505-4cb5c6892ec6" file="config.yaml" />
-    <blackboard-rest-lms:config name="Blackboard_Rest_Lms_Config" doc:name="Blackboard Rest Lms Config" doc:id="ae3493bb-a7fa-4fc2-948a-846768f3508a">
-        <blackboard-rest-lms:authorization-connection authorizationHeader="#[&quot;Bearer &quot; ++ vars.token.access_token]" />
-    </blackboard-rest-lms:config>
-    <blackboard-access-token:config name="Blackboard_Access_Token_Config" doc:name="Blackboard Access Token Config" doc:id="416f781f-eca3-425a-9b12-654887355849" applicationKey="18af2425-b4f2-47ca-a773-e32a604e5f96" applicationSecret="YYR8NmhtHiHEX375cOYk0PqsQo7vPD6b">
-        <blackboard-access-token:unsecured-connection />
-    </blackboard-access-token:config>
     <flow name="blackboard-rest-lms-main">
-        <http:listener config-ref="blackboard-rest-lms-httpListenerConfig" path="/api/*">
+        <http:listener path="/api/*" config-ref="blackboard-rest-lms-httpListenerConfig">
             <http:response statusCode="#[vars.httpStatus default 200]">
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:response>
             <http:error-response statusCode="#[vars.httpStatus default 500]">
-                <http:body>#[payload]</http:body>
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:router config-ref="blackboard-rest-lms-config" />
+        <apikit:router config-ref="blackboard-rest-lms-config"/>
         <error-handler ref="Global-Error-Handler" />
     </flow>
     <flow name="blackboard-rest-lms-console">
-        <http:listener config-ref="blackboard-rest-lms-httpListenerConfig" path="/console/*">
+        <http:listener path="/console/*" config-ref="blackboard-rest-lms-httpListenerConfig">
             <http:response statusCode="#[vars.httpStatus default 200]">
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:response>
             <http:error-response statusCode="#[vars.httpStatus default 500]">
-                <http:body>#[payload]</http:body>
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:console config-ref="blackboard-rest-lms-config" />
+        <apikit:console config-ref="blackboard-rest-lms-config"/>
         <error-handler ref="Global-Error-Handler" />
     </flow>
     <flow name="put:\v1\catalog\categories\(categoryType)\(categoryId)\courses\(courseId):blackboard-rest-lms-config">
@@ -51,7 +35,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="75fec68e-f2fd-412f-8d8b-9ffc34e0e8d0" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:put-v1-catalog-categories-category-type-category-id-courses-course-id doc:name="Create Category Membership" doc:id="d1b30028-5ed0-4a4c-812f-efdf72ccd799" categoryTypeUriParam="#[vars.categoryType]" categoryIdUriParam="#[vars.categoryId]" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:put-v1-catalog-categories-category-type-category-id-courses-course-id doc:name="Create Category Membership" doc:id="d1b30028-5ed0-4a4c-812f-efdf72ccd799" categoryTypeUriParam="#[vars.categoryType]" categoryIdUriParam="#[vars.categoryId]" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="put:\v1\courses\(courseId)\children\(childCourseId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -61,7 +45,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="d647ced1-8207-4c5b-b89e-a5544be15290" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:put-v1-courses-course-id-children-child-course-id doc:name="Add Child Course" doc:id="433d2129-ff16-4f4b-993c-025c2b2ff069" courseIdUriParam="#[vars.courseId]" childCourseIdUriParam="#[vars.childCourseId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:put-v1-courses-course-id-children-child-course-id doc:name="Add Child Course" doc:id="433d2129-ff16-4f4b-993c-025c2b2ff069" courseIdUriParam="#[vars.courseId]" childCourseIdUriParam="#[vars.childCourseId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="put:\v1\courses\(courseId)\users\(userId):application\json:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -71,7 +55,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="089e342f-60ce-4d1c-98f8-cf24839f7b1a" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:put-v1-courses-course-id-users-user-id doc:name="Create Course User Membership" doc:id="24740f0d-0d18-45f1-aa64-cc18c1888ae4" courseIdUriParam="#[vars.courseId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:put-v1-courses-course-id-users-user-id doc:name="Create Course User Membership" doc:id="24740f0d-0d18-45f1-aa64-cc18c1888ae4" courseIdUriParam="#[vars.courseId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="delete:\v1\catalog\categories\(categoryType)\(categoryId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -81,7 +65,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="85753334-4f1f-4c8d-bb8c-6a39aa7bba57" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:delete-v1-catalog-categories-category-type-category-id doc:name="Delete Category" doc:id="4b0fb34a-fea1-42c6-b450-362fbc676197" categoryTypeUriParam="#[vars.categoryType]" categoryIdUriParam="#[vars.categoryId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:delete-v1-catalog-categories-category-type-category-id doc:name="Delete Category" doc:id="4b0fb34a-fea1-42c6-b450-362fbc676197" categoryTypeUriParam="#[vars.categoryType]" categoryIdUriParam="#[vars.categoryId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="delete:\v1\catalog\categories\(categoryType)\(categoryId)\courses\(courseId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -92,7 +76,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="0226a988-71f7-4bfe-80b5-cd9ec12be9a1" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:delete-v1-catalog-categories-category-type-category-id-courses-course-id doc:name="Delete Category Membership" doc:id="9289774f-5c50-497b-9b6e-3cd8ac766dcd" categoryTypeUriParam="#[vars.categoryType]" categoryIdUriParam="#[vars.categoryId]" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:delete-v1-catalog-categories-category-type-category-id-courses-course-id doc:name="Delete Category Membership" doc:id="9289774f-5c50-497b-9b6e-3cd8ac766dcd" categoryTypeUriParam="#[vars.categoryType]" categoryIdUriParam="#[vars.categoryId]" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="delete:\v1\courses\(courseId)\children\(childCourseId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -102,7 +86,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="b689d76b-8e63-4dbb-8e01-fc1bb3480872" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:delete-v1-courses-course-id-children-child-course-id doc:name="Remove Child Course" doc:id="5993a1bf-0cc1-4e5a-aecc-73afaaea45f9" courseIdUriParam="#[vars.courseId]" childCourseIdUriParam="#[vars.childCourseId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:delete-v1-courses-course-id-children-child-course-id doc:name="Remove Child Course" doc:id="5993a1bf-0cc1-4e5a-aecc-73afaaea45f9" courseIdUriParam="#[vars.courseId]" childCourseIdUriParam="#[vars.childCourseId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="delete:\v1\courses\(courseId)\meetings\users\(userId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -112,7 +96,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="7d8063ad-10f5-4af0-adde-a8126b361bc7" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:delete-v1-courses-course-id-meetings-users-user-id doc:name="Delete All Attendance Records by Course and User Id" doc:id="1c9ffb79-6f6a-4380-853e-e461f14d6254" courseIdUriParam="#[vars.courseId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:delete-v1-courses-course-id-meetings-users-user-id doc:name="Delete All Attendance Records by Course and User Id" doc:id="1c9ffb79-6f6a-4380-853e-e461f14d6254" courseIdUriParam="#[vars.courseId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="delete:\v1\courses\(courseId)\meetings\(meetingId)\users\(userId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -123,7 +107,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="0461539f-c838-4596-a251-5bcdc3d34a4e" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:delete-v1-courses-course-id-meetings-meeting-id-users-user-id doc:name="Delete Attendance Record" doc:id="b4df93fa-2d3f-4710-a56a-42830355b112" courseIdUriParam="#[vars.courseId]" meetingIdUriParam="#[vars.meetingId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:delete-v1-courses-course-id-meetings-meeting-id-users-user-id doc:name="Delete Attendance Record" doc:id="b4df93fa-2d3f-4710-a56a-42830355b112" courseIdUriParam="#[vars.courseId]" meetingIdUriParam="#[vars.meetingId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="delete:\v1\courses\(courseId)\users\(userId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -133,7 +117,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="250ce73c-7cb1-4ad3-a91a-2d9a3abcca22" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:delete-v1-courses-course-id-users-user-id doc:name="Delete Course Membership" doc:id="83847a4e-5734-4989-a9a5-960da456e658" courseIdUriParam="#[vars.courseId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:delete-v1-courses-course-id-users-user-id doc:name="Delete Course Membership" doc:id="83847a4e-5734-4989-a9a5-960da456e658" courseIdUriParam="#[vars.courseId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="delete:\v1\terms\(termId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -142,7 +126,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="27bee787-3434-498b-a04c-c7d25c8b4410" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:delete-v1-terms-term-id doc:name="Delete Term" doc:id="775d6779-1acf-49ac-a793-295cc64fad2c" termIdUriParam="#[vars.termId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:delete-v1-terms-term-id doc:name="Delete Term" doc:id="775d6779-1acf-49ac-a793-295cc64fad2c" termIdUriParam="#[vars.termId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="delete:\v1\users\(userId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -151,7 +135,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="3723c717-600d-4b0d-ac11-c420880b54b1" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:delete-v1-users-user-id doc:name="Delete User" doc:id="5ff0d86e-ea6c-4be3-80c6-663c76e55899" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:delete-v1-users-user-id doc:name="Delete User" doc:id="5ff0d86e-ea6c-4be3-80c6-663c76e55899" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="delete:\v3\courses\(courseId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -160,7 +144,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="f5a2ece6-afe1-4465-b9f3-05ba6030e544" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:delete-v3-courses-course-id doc:name="Delete Course" doc:id="3b23eb67-ffeb-4eb0-a92f-b560b22222ab" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:delete-v3-courses-course-id doc:name="Delete Course" doc:id="3b23eb67-ffeb-4eb0-a92f-b560b22222ab" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="patch:\v1\catalog\categories\(categoryType)\(categoryId):application\json:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -170,7 +154,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="0a8a69b1-12bc-4e0b-a91d-b39db2303d96" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:patch-v1-catalog-categories-category-type-category-id doc:name="Update Category" doc:id="06a47ae1-4e99-4ca5-986f-bc2a279fc896" categoryTypeUriParam="#[vars.categoryType]" categoryIdUriParam="#[vars.categoryId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:patch-v1-catalog-categories-category-type-category-id doc:name="Update Category" doc:id="06a47ae1-4e99-4ca5-986f-bc2a279fc896" categoryTypeUriParam="#[vars.categoryType]" categoryIdUriParam="#[vars.categoryId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="patch:\v1\courses\(courseId)\meetings\(meetingId)\users\(userId):application\json:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -181,7 +165,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="d5ca0ff7-a4dc-4ee3-9b01-2070f0d60daf" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:patch-v1-courses-course-id-meetings-meeting-id-users-user-id doc:name="Update Course Meeting Attendance" doc:id="bb6f1001-7a2c-49fe-9661-f075ab747f71" courseIdUriParam="#[vars.courseId]" meetingIdUriParam="#[vars.meetingId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:patch-v1-courses-course-id-meetings-meeting-id-users-user-id doc:name="Update Course Meeting Attendance" doc:id="bb6f1001-7a2c-49fe-9661-f075ab747f71" courseIdUriParam="#[vars.courseId]" meetingIdUriParam="#[vars.meetingId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="patch:\v1\courses\(courseId)\meetings\(meetingId):application\json:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -191,7 +175,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="d8cb0b8d-0c17-47f8-a4e8-ee5c00ab61ac" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:patch-v1-courses-course-id-meetings-meeting-id doc:name="Update Course Meeting" doc:id="e774a945-15d4-419b-bdea-3ff37a951b96" courseIdUriParam="#[vars.courseId]" meetingIdUriParam="#[vars.meetingId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:patch-v1-courses-course-id-meetings-meeting-id doc:name="Update Course Meeting" doc:id="e774a945-15d4-419b-bdea-3ff37a951b96" courseIdUriParam="#[vars.courseId]" meetingIdUriParam="#[vars.meetingId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="patch:\v1\courses\(courseId)\users\(userId):application\json:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -201,7 +185,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="6bd93735-c40e-4a55-8c30-f5e5218d58c0" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:patch-v1-courses-course-id-users-user-id doc:name="Update Course User Membership" doc:id="a721ba72-fbe0-4506-b3c4-38b0db3df321" courseIdUriParam="#[vars.courseId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:patch-v1-courses-course-id-users-user-id doc:name="Update Course User Membership" doc:id="a721ba72-fbe0-4506-b3c4-38b0db3df321" courseIdUriParam="#[vars.courseId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="patch:\v1\terms\(termId):application\json:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -210,7 +194,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="87bab542-970b-414b-a255-16a265b0208e" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:patch-v1-terms-term-id doc:name="Update Term" doc:id="cb97d665-73c2-4904-97f7-afe9c1b25c8d" termIdUriParam="#[vars.termId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:patch-v1-terms-term-id doc:name="Update Term" doc:id="cb97d665-73c2-4904-97f7-afe9c1b25c8d" termIdUriParam="#[vars.termId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="patch:\v1\users\(userId):application\json:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -219,7 +203,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="067e072b-c374-4ec5-a8d6-6d2a809fffb2" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:patch-v1-users-user-id doc:name="Update User" doc:id="45485307-13d9-42ae-a012-113aa47f52b0" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:patch-v1-users-user-id doc:name="Update User" doc:id="45485307-13d9-42ae-a012-113aa47f52b0" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="patch:\v3\courses\(courseId):application\json:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -228,11 +212,11 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="4a99ce50-84e6-460b-9cb8-db7c2f9d8689" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:patch-v3-courses-course-id doc:name="Update Course" doc:id="fc455399-269d-41a2-9359-f41e6b1073ad" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:patch-v3-courses-course-id doc:name="Update Course" doc:id="fc455399-269d-41a2-9359-f41e6b1073ad" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\calendars\items:blackboard-rest-lms-config">
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="a31c82f6-2ee0-458e-ae30-7f7237f9f94f" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-calendars-items doc:name="Upcoming events" doc:id="a282d13f-a9ad-4989-9550-2f898dfc1334" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-calendars-items doc:name="Upcoming events" doc:id="a282d13f-a9ad-4989-9550-2f898dfc1334" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\catalog\categories\(categoryType):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -241,7 +225,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="659c5e7f-482f-4b53-a8a5-89dd63ea9053" name="blackboard-token-subFlow" />
-		<blackboard-rest-lms:get-v1-catalog-categories-category-type doc:name="Get Categories" doc:id="4a53e5cf-ecef-4bc9-bb09-9b74c702a01d" config-ref="Blackboard_Rest_Lms_Config" categoryTypeUriParam="#[vars.categoryType]"/>
+		<blackboard-rest-lms:get-v1-catalog-categories-category-type doc:name="Get Categories" doc:id="4a53e5cf-ecef-4bc9-bb09-9b74c702a01d" categoryTypeUriParam="#[vars.categoryType]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\catalog\categories\(categoryType)\(categoryId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -251,7 +235,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="784d9b9c-2103-403c-b2a0-73a6c8edbf57" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-catalog-categories-category-type-category-id doc:name="Get Category by Type and ID" doc:id="1f278232-88c4-4410-8ff8-542dbeec31ac" categoryTypeUriParam="#[vars.categoryType]" categoryIdUriParam="#[vars.categoryId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-catalog-categories-category-type-category-id doc:name="Get Category by Type and ID" doc:id="1f278232-88c4-4410-8ff8-542dbeec31ac" categoryTypeUriParam="#[vars.categoryType]" categoryIdUriParam="#[vars.categoryId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\catalog\categories\(categoryType)\(categoryId)\courses:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -261,7 +245,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="7f8a12a3-921f-4432-84b6-0d03ea65e69e" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-catalog-categories-category-type-category-id-courses doc:name="Get Category Memberships" doc:id="04471084-008a-47c3-addd-bd482e129d5c" categoryTypeUriParam="#[vars.categoryType]" categoryIdUriParam="#[vars.categoryId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-catalog-categories-category-type-category-id-courses doc:name="Get Category Memberships" doc:id="04471084-008a-47c3-addd-bd482e129d5c" categoryTypeUriParam="#[vars.categoryType]" categoryIdUriParam="#[vars.categoryId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\catalog\categories\(categoryType)\(parentId)\children:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -271,7 +255,7 @@
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="f2547d8f-9a33-428c-8e07-b10c14a2c819" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-catalog-categories-category-type-parent-id-children categoryTypeUriParam="COURSE" doc:name="Get Child Categories" doc:id="59dbc690-6410-4411-b5b4-14dd4079d4e3" parentIdUriParam="#[vars.parentId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-catalog-categories-category-type-parent-id-children categoryTypeUriParam="COURSE" doc:name="Get Child Categories" doc:id="59dbc690-6410-4411-b5b4-14dd4079d4e3" parentIdUriParam="#[vars.parentId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\courseRoles:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -301,7 +285,7 @@ output application/json
             </ee:message>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="1d50362f-2b51-464b-bf26-e195be759fcf" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-course-roles doc:name="Get Course Roles" doc:id="52ef353d-67f3-482a-b382-d3303accf5d1" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-course-roles doc:name="Get Course Roles" doc:id="52ef353d-67f3-482a-b382-d3303accf5d1" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\courseRoles\(roleId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -310,7 +294,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="958f607d-a021-409c-88e1-82f7b2c86d1a" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-course-roles-role-id doc:name="Get Course Role" doc:id="231b1bab-1037-42fc-ab90-18c4bad90011" roleIdUriParam="#[vars.roleId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-course-roles-role-id doc:name="Get Course Role" doc:id="231b1bab-1037-42fc-ab90-18c4bad90011" roleIdUriParam="#[vars.roleId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\courses\(courseId)\children:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -319,7 +303,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="169551cb-a694-4786-9463-8f387b54b9f6" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v3-courses-course-id doc:name="Get Course" doc:id="be790883-253c-44b3-8959-4422eac70bff" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v3-courses-course-id doc:name="Get Course" doc:id="be790883-253c-44b3-8959-4422eac70bff" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\courses\(courseId)\children\(childCourseId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -329,7 +313,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="4f3d4170-b68e-4a35-81b2-e3033dd89c1c" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-courses-course-id-children-child-course-id doc:name="Get Course Child" doc:id="b1f9d50e-148d-462a-872c-507e54e5a800" config-ref="Blackboard_Rest_Lms_Config" courseIdUriParam="#[vars.courseId]" childCourseIdUriParam="#[vars.childCourseId]" />
+        <blackboard-rest-lms:get-v1-courses-course-id-children-child-course-id doc:name="Get Course Child" doc:id="b1f9d50e-148d-462a-872c-507e54e5a800" courseIdUriParam="#[vars.courseId]" childCourseIdUriParam="#[vars.childCourseId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\courses\(courseId)\gradebook\categories:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -338,7 +322,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="8a035f4a-e5fe-4b72-94b2-8381494d8c37" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-courses-course-id-gradebook-categories doc:name="Get Gradebook Categories" doc:id="4a95db24-4591-4272-80e4-0b4f3ecf35a9" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-courses-course-id-gradebook-categories doc:name="Get Gradebook Categories" doc:id="4a95db24-4591-4272-80e4-0b4f3ecf35a9" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\courses\(courseId)\meetings:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -347,7 +331,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="9cb86ab7-5769-48d7-b466-941274952c75" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-courses-course-id-meetings doc:name="Get Course Meeting" doc:id="da9f123f-c5ea-4790-8992-29be8144bf55" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-courses-course-id-meetings doc:name="Get Course Meeting" doc:id="da9f123f-c5ea-4790-8992-29be8144bf55" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\courses\(courseId)\meetings\users\(userId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -357,7 +341,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="5d46bb24-ebf9-4498-adc7-979e33b5bbac" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-courses-course-id-meetings-users-user-id doc:name="Get Attendance by User Id" doc:id="bbb0f4de-6c61-4932-ba37-9ed74e3765e0" courseIdUriParam="#[vars.courseId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-courses-course-id-meetings-users-user-id doc:name="Get Attendance by User Id" doc:id="bbb0f4de-6c61-4932-ba37-9ed74e3765e0" courseIdUriParam="#[vars.courseId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\courses\(courseId)\meetings\(meetingId)\users:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -367,7 +351,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="a81e98ec-079f-442c-acb5-8f73e1ba5ffd" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-courses-course-id-meetings-meeting-id-users doc:name="Get Attendance Records by Meeting Id" doc:id="e019b801-ac75-4fee-ac87-1c9562ef39d8" courseIdUriParam="#[vars.courseId]" meetingIdUriParam="#[vars.meetingId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-courses-course-id-meetings-meeting-id-users doc:name="Get Attendance Records by Meeting Id" doc:id="e019b801-ac75-4fee-ac87-1c9562ef39d8" courseIdUriParam="#[vars.courseId]" meetingIdUriParam="#[vars.meetingId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\courses\(courseId)\meetings\(meetingId)\users\(userId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -378,7 +362,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="bc71021c-00a6-406e-a1d7-8d96dd6c741e" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-courses-course-id-meetings-meeting-id-users-user-id doc:name="Get Attendance Record" doc:id="f2390cc5-c6d6-47f9-9c24-ea2edc88b488" courseIdUriParam="#[vars.courseId]" meetingIdUriParam="#[vars.meetingId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-courses-course-id-meetings-meeting-id-users-user-id doc:name="Get Attendance Record" doc:id="f2390cc5-c6d6-47f9-9c24-ea2edc88b488" courseIdUriParam="#[vars.courseId]" meetingIdUriParam="#[vars.meetingId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\courses\(courseId)\users:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -387,7 +371,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="4bd40558-b1b2-41dd-8a46-8a0883bd7bf0" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-courses-course-id-users doc:name="Get Course Memberships" doc:id="dfebae6d-1a65-4b2f-be36-d18f99dff979" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-courses-course-id-users doc:name="Get Course Memberships" doc:id="dfebae6d-1a65-4b2f-be36-d18f99dff979" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\courses\(courseId)\users\(userId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -397,11 +381,11 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="33aa05d2-403f-4cca-b14a-17d197dd3434" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-courses-course-id-users-user-id doc:name="Get Course Membership" doc:id="a9d285ae-f2cf-4997-8e6e-3b0f71232a5d" courseIdUriParam="#[vars.courseId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-courses-course-id-users-user-id doc:name="Get Course Membership" doc:id="a9d285ae-f2cf-4997-8e6e-3b0f71232a5d" courseIdUriParam="#[vars.courseId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\institutionRoles:blackboard-rest-lms-config">
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="f431423d-144b-4ee9-befe-b3ba5a291dd6" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-institution-roles doc:name="Get Institution Roles" doc:id="fc767677-9d85-41ee-a0fa-179f738f2edb" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-institution-roles doc:name="Get Institution Roles" doc:id="fc767677-9d85-41ee-a0fa-179f738f2edb" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\institutionRoles\(roleId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -410,11 +394,11 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="f65bdde7-2ff6-4752-bce1-b3e908d9c623" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-institution-roles-role-id doc:name="Get Institution Role" doc:id="2699145d-aaad-49a4-99a3-78322c305531" roleIdUriParam="#[vars.roleId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-institution-roles-role-id doc:name="Get Institution Role" doc:id="2699145d-aaad-49a4-99a3-78322c305531" roleIdUriParam="#[vars.roleId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\terms:blackboard-rest-lms-config">
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="d26c22f7-f013-42a8-a4d9-9e3a48fe5e84" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-terms doc:name="Get Terms" doc:id="cbad3659-1720-48c9-a81c-ce326aefec3b" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-terms doc:name="Get Terms" doc:id="cbad3659-1720-48c9-a81c-ce326aefec3b" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\terms\(termId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -423,7 +407,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="67978877-1864-48c2-b0fa-a8fafb935494" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-terms-term-id doc:name="Get Terms By termId" doc:id="7b6098e3-d255-46b6-a6a8-671c4993ba75" termIdUriParam="#[vars.termId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-terms-term-id doc:name="Get Terms By termId" doc:id="7b6098e3-d255-46b6-a6a8-671c4993ba75" termIdUriParam="#[vars.termId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\users:blackboard-rest-lms-config">
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="c100da3e-8dd1-4566-91ff-d9e65c73b471" name="blackboard-token-subFlow" />
@@ -436,7 +420,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="d0150f18-dca2-4854-a5c3-6649920bfa73" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-users-user-id doc:name="Get User" doc:id="7e1b358c-638c-45d8-a916-e1a61085b921" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-users-user-id doc:name="Get User" doc:id="7e1b358c-638c-45d8-a916-e1a61085b921" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v1\users\(userId)\courses:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -445,7 +429,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="77792404-9c3c-48c0-aa8c-d37763213a8b" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v1-users-user-id-courses doc:name="Get User Memberships" doc:id="1118371a-33a0-44fa-92cd-d286ff34aa5c" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v1-users-user-id-courses doc:name="Get User Memberships" doc:id="1118371a-33a0-44fa-92cd-d286ff34aa5c" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v2\courses\(courseId)\gradebook\columns:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -454,7 +438,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="1115ceb3-7e9a-44d6-9c45-edd75d9c202e" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v2-courses-course-id-gradebook-columns doc:name="Get Grade Columns" doc:id="7a54a923-6ece-47b4-b56c-69b5eaab0a6f" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v2-courses-course-id-gradebook-columns doc:name="Get Grade Columns" doc:id="7a54a923-6ece-47b4-b56c-69b5eaab0a6f" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v2\courses\(courseId)\gradebook\columns\(columnId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -464,7 +448,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="dac3a0c8-6fe6-452c-b12c-0c2ea3ca2cd7" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v2-courses-course-id-gradebook-columns-column-id doc:name="Get Grade Column" doc:id="a630a56e-f927-4a6b-9b4e-c6953d9bf3a0" courseIdUriParam="#[vars.courseId]" columnIdUriParam="#[vars.columnId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v2-courses-course-id-gradebook-columns-column-id doc:name="Get Grade Column" doc:id="a630a56e-f927-4a6b-9b4e-c6953d9bf3a0" courseIdUriParam="#[vars.courseId]" columnIdUriParam="#[vars.columnId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v2\courses\(courseId)\gradebook\columns\(columnId)\users:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -474,7 +458,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="b3591a10-75df-4e4f-8886-19f5f44eb22e" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v2-courses-course-id-gradebook-columns-column-id-users doc:name="Get Column Grades" doc:id="0b008649-56fb-4b63-bd72-07b614d48887" courseIdUriParam="#[vars.courseId]" columnIdUriParam="#[vars.columnId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v2-courses-course-id-gradebook-columns-column-id-users doc:name="Get Column Grades" doc:id="0b008649-56fb-4b63-bd72-07b614d48887" courseIdUriParam="#[vars.courseId]" columnIdUriParam="#[vars.columnId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v2\courses\(courseId)\gradebook\columns\(columnId)\users\(userId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -485,7 +469,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="ec523251-1471-41f2-b3be-0629b18d5dfc" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v2-courses-course-id-gradebook-columns-column-id-users-user-id doc:name="Get Column Grade" doc:id="8acf1a6e-de10-4101-b18c-a3ca55bcece9" courseIdUriParam="#[vars.courseId]" columnIdUriParam="#[vars.columnId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v2-courses-course-id-gradebook-columns-column-id-users-user-id doc:name="Get Column Grade" doc:id="8acf1a6e-de10-4101-b18c-a3ca55bcece9" courseIdUriParam="#[vars.courseId]" columnIdUriParam="#[vars.columnId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v2\courses\(courseId)\gradebook\users\(userId):blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -495,7 +479,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="0d8b08ad-9589-42da-8c0a-0a9455615fc5" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v2-courses-course-id-gradebook-users-user-id doc:name="Get User Grades" doc:id="1859458c-bb47-433a-a6fa-601667cf6960" courseIdUriParam="#[vars.courseId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v2-courses-course-id-gradebook-users-user-id doc:name="Get User Grades" doc:id="1859458c-bb47-433a-a6fa-601667cf6960" courseIdUriParam="#[vars.courseId]" userIdUriParam="#[vars.userId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="get:\v3\courses:blackboard-rest-lms-config">
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="bdd10eb7-b4bc-4323-9225-9c6dc2a3dfb7" name="blackboard-token-subFlow" />
@@ -508,7 +492,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="f61c23d5-5f7d-4191-bd93-0b6bb24b9e48" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:get-v3-courses-course-id doc:name="Get Course" doc:id="e9b8bbf1-7e67-4a82-b226-e22e6d1879d5" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:get-v3-courses-course-id doc:name="Get Course" doc:id="e9b8bbf1-7e67-4a82-b226-e22e6d1879d5" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="post:\v1\catalog\categories\(categoryType):application\json:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -517,7 +501,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="c49aa27a-2d89-4fb5-b781-68a012a517ff" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:post-v1-catalog-categories-category-type categoryTypeUriParam="#[vars.categoryType]" doc:name="Create Category" doc:id="2d9644c8-0632-47ad-91d6-81d74486bf9c" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:post-v1-catalog-categories-category-type categoryTypeUriParam="#[vars.categoryType]" doc:name="Create Category" doc:id="2d9644c8-0632-47ad-91d6-81d74486bf9c" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="post:\v1\courses\(courseId)\meetings\(meetingId)\users:application\json:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -527,7 +511,7 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="54fdd53d-3b07-46dc-a78f-a781f9b31830" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:post-v1-courses-course-id-meetings-meeting-id-users doc:name="Create Attendance Record" doc:id="6b5645d9-1abd-412f-9982-c7d88c5a8d42" courseIdUriParam="#[vars.courseId]" meetingIdUriParam="#[vars.meetingId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:post-v1-courses-course-id-meetings-meeting-id-users doc:name="Create Attendance Record" doc:id="6b5645d9-1abd-412f-9982-c7d88c5a8d42" courseIdUriParam="#[vars.courseId]" meetingIdUriParam="#[vars.meetingId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="post:\v1\courses\(courseId)\meetings:application\json:blackboard-rest-lms-config">
         <ee:transform doc:name="Transform Message">
@@ -536,19 +520,19 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="8dd1c5df-c081-4d17-800a-5a62ec24652b" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:post-v1-courses-course-id-meetings doc:name="Create Course Meeting" doc:id="acc9c4e4-acfc-4aea-a0fb-6530d25a9a26" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:post-v1-courses-course-id-meetings doc:name="Create Course Meeting" doc:id="acc9c4e4-acfc-4aea-a0fb-6530d25a9a26" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="post:\v1\terms:application\json:blackboard-rest-lms-config">
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="447fcca3-4b89-44b6-8fe5-298e13f483b6" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:post-v1-terms doc:name="Create Term" doc:id="f3ad25bb-feb9-42ae-bf59-c6572943e753" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:post-v1-terms doc:name="Create Term" doc:id="f3ad25bb-feb9-42ae-bf59-c6572943e753" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="post:\v1\users:application\json:blackboard-rest-lms-config">
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="ef00d5fe-8358-47f3-8175-a44af0d17119" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:post-v1-users doc:name="Create User" doc:id="643a47a2-85ac-4478-8419-c15d4a16eeaa" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:post-v1-users doc:name="Create User" doc:id="643a47a2-85ac-4478-8419-c15d4a16eeaa" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <flow name="post:\v3\courses:application\json:blackboard-rest-lms-config">
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="bcf4f77b-c75f-47b6-b9c2-352487051f7e" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:post-v3-courses doc:name="Create Course" doc:id="74ccc7d7-336e-4111-a074-3d0d11533877" config-ref="Blackboard_Rest_Lms_Config" />
+        <blackboard-rest-lms:post-v3-courses doc:name="Create Course" doc:id="74ccc7d7-336e-4111-a074-3d0d11533877" config-ref="Blackboard_Rest_Lms_Config"/>
         <error-handler>
             <on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="10218320-5816-4cd9-9541-2c309459ecc2" type="BLACKBOARD-REST-LMS:CLIENT_ERROR">
                 <ee:transform doc:name="Transform Message" doc:id="15a8b77a-8c49-4e0b-9274-f7055ac467d0">
@@ -576,10 +560,10 @@ output application/json
             </ee:variables>
         </ee:transform>
         <flow-ref doc:name="blackboard-token-subFlow" doc:id="30407abb-3f07-4b34-bfff-907b7f0c58aa" name="blackboard-token-subFlow" />
-        <blackboard-rest-lms:delete-v1-courses-course-id-meetings doc:name="Delete Course Meeting" doc:id="1503f601-ec25-4683-b0b8-b655a4d28349" config-ref="Blackboard_Rest_Lms_Config" courseIdUriParam="#[vars.courseId]" />
+        <blackboard-rest-lms:delete-v1-courses-course-id-meetings doc:name="Delete Course Meeting" doc:id="1503f601-ec25-4683-b0b8-b655a4d28349" courseIdUriParam="#[vars.courseId]" config-ref="Blackboard_Rest_Lms_Config"/>
     </flow>
     <sub-flow name="blackboard-token-subFlow" doc:id="6c13b378-ccda-4d43-a853-bbb228e01973">
-        <blackboard-access-token:post-oauth2-token doc:name="Create oauth2 token" doc:id="ae1829d2-efd6-4741-aad7-bc4dc7cd5f67" config-ref="Blackboard_Access_Token_Config" target="token">
+        <blackboard-access-token:post-oauth2-token doc:name="Create oauth2 token" doc:id="ae1829d2-efd6-4741-aad7-bc4dc7cd5f67" target="token" config-ref="Blackboard_Access_Token_Config">
             <blackboard-access-token:post-oauth2-token-body><![CDATA[#[%dw 2.0
 output application/x-www-form-urlencoded
 ---

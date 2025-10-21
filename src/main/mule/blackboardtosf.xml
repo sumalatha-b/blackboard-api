@@ -3,10 +3,10 @@
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
-	<flow name="blackboardtosfCreateAndUpdateFlow" doc:id="b58a9eea-c438-4167-98df-d8fd0a223a17" >
+	<flow name="blackboardToSalesforceCreateAndUpdateTermsFlow" doc:id="b58a9eea-c438-4167-98df-d8fd0a223a17" >
 		<logger level="INFO" doc:name="Logger" doc:id="383e892b-f7f1-4d53-8644-8601c62318e2" />
 	</flow>
-	<flow name="blackboardtosfDeleteFlow" doc:id="1eea17b4-b25b-44ff-8e8b-65e631139fb2" >
+	<flow name="blackboardToSalesforceDeleteTermsFlow" doc:id="1eea17b4-b25b-44ff-8e8b-65e631139fb2" >
 		<logger level="INFO" doc:name="Logger" doc:id="415815be-a400-481c-aa98-eae19fc10611" />
 	</flow>
 </mule>
