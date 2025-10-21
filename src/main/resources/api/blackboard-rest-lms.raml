@@ -395,9 +395,10 @@ types:
     responses:
       200:
         body:
-          appliaction/json:
+          application/json:
             type: getUsers
             example: !include /examples/users/getUsers-example.json
+
   post:
     displayName: Create User
     description: Creates a user. The 'system.user.CREATE' entitlement is needed.
@@ -484,27 +485,6 @@ types:
     description: |
       Returns a list of courses and organizations.
       To view disabled courses a user must have the entitlement 'system.course.VIEW'.
-    queryParameters:
-      offset?: integer
-      includePermissions?: boolean
-      limit?: integer
-      modified?: datetime
-      modifiedCompare?: string
-      courseId?: string
-      name?: string
-      description?: string
-      externalId?: string
-      created?: datetime
-      createdCompare?: string
-      allowGuests?: boolean
-      availability.available?:
-        type: string
-        enum: [ Yes, No, Disabled, Term ]
-      dataSourceId?: string
-      termId?: string
-      organization?: boolean
-      sort?: string
-      fields?: string
     responses:
       200:
         body:
@@ -721,61 +701,10 @@ types:
   uriParameters:
     categoryType:
       type: string
-      required: true
-      
+      required: true   
   get:
     displayName: Get Categories
     description: Get Categories
-    queryParameters:
-      sort?:
-        type: string
-        description: Comma-delimited list of JSON properties to sort by, with optional "(desc)" for descending.
-        example: "title(desc),created"
-      offset?:
-        type: integer
-        description: Number of rows to skip before returning results.
-        example: 0
-      includePermissions?:
-        type: boolean
-        description: Flag to include permissions in the response.
-        example: true
-      limit?:
-        type: integer
-        description: Maximum number of results to return.
-        example: 25
-      title?:
-        type: string
-        description: Search for categories containing this title.
-        example: "Science"
-      categoryId?:
-        type: string
-        description: Search for categories where category ID contains this value.
-        example: "1001"
-      created?:
-        type: datetime
-        description: Search for categories with created date relative to this value.
-        example: "2025-09-15T05:03:30.002Z"
-      createdCompare?:
-        type: string
-        enum: [lessThan, greaterOrEqual]
-        description: Comparison type used with 'created'. Defaults to greaterOrEqual.
-        example: "lessThan"
-      dataSourceId?:
-        type: string
-        description: Search for categories with matching data source id.
-        example: "external_23"
-      frontPage?:
-        type: boolean
-        description: Search for categories with a front page indicator matching this value.
-        example: false
-      available?:
-        type: boolean
-        description: Search for categories with availability matching this value.
-        example: true
-      fields?:
-        type: string
-        description: Comma-delimited list of fields to include in the response.
-        example: "id,title,available"
     responses:
       200:
         body:
@@ -806,8 +735,7 @@ types:
     categoryType:
       type: string
       required: true
-      enum: [Course, Organization]
-      example: "Course"
+      
     categoryId:
       type: string
       required: true
@@ -842,8 +770,7 @@ types:
     categoryType:
       type: string
       required: true
-      enum: [Course, Organization]
-      example: "Course"
+      
     parentId:
       type: string
       required: true

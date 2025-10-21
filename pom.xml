@@ -7,7 +7,7 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>mule-application</packaging>
 
-	<name>blackboard-rest-lms</name>
+	<name>blackboard-rest-lms-v4</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -64,13 +64,7 @@
 		<dependency>
 			<groupId>4f77fae5-8c82-4374-8d34-eb141c2786b9</groupId>
 			<artifactId>blackboard-rest-lms</artifactId>
-			<version>1.0.8-BETA</version>
-			<classifier>mule-plugin</classifier>
-		</dependency>
-		<dependency>
-			<groupId>com.mulesoft.connectors</groupId>
-			<artifactId>mule-salesforce-connector</artifactId>
-			<version>10.20.0</version>
+			<version>1.0.10-BETA</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
 	</dependencies>
