@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:blackboard-rest-lms="http://www.mulesoft.org/schema/mule/blackboard-rest-lms"
+	xmlns:blackboard-access-token="http://www.mulesoft.org/schema/mule/blackboard-access-token"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/blackboard-access-token http://www.mulesoft.org/schema/mule/blackboard-access-token/current/mule-blackboard-access-token.xsd
+http://www.mulesoft.org/schema/mule/blackboard-rest-lms http://www.mulesoft.org/schema/mule/blackboard-rest-lms/current/mule-blackboard-rest-lms.xsd">
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="8731425d-85b0-460c-b76e-b5f5f5b99366" >
+		<salesforce:basic-connection username="aurosmit.sahoo@nexturn.com.lms.educloud" password="Aurosmit@2001" securityToken="wEpfQlYMXv8VvhsNwrGqlptQl"/>
+	</salesforce:sfdc-config>
+	<http:listener-config name="blackboard-rest-lms-httpListenerConfig">
+        <http:listener-connection host="${https.host}" port="${https.port}" protocol="HTTPS">
+            <tls:context>
+                <tls:key-store type="jks" path="Client-Keystore.jks" keyPassword="Mule12345" password="Mule12345" />
+            </tls:context>
+        </http:listener-connection>
+    </http:listener-config>
+    <apikit:config name="blackboard-rest-lms-config" api="blackboard-rest-lms.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <configuration doc:name="Configuration" doc:id="347ce9b2-81d3-4293-bc06-0db270c71e48" defaultErrorHandler-ref="Global-Error-Handler" />
+    <configuration-properties doc:name="Configuration properties" doc:id="56ed43b9-e9a8-4ba6-8d1a-897bd2bbb07b" file="config.yaml" />
+    <blackboard-rest-lms:config name="Blackboard_Rest_Lms_Config" doc:name="Blackboard Rest Lms Config" doc:id="9a760b4b-c68c-4f22-a9ee-ceded6467c84">
+        <blackboard-rest-lms:authorization-connection authorizationHeader="#[&quot;Bearer &quot; ++ vars.token.access_token]" />
+    </blackboard-rest-lms:config>
+    <blackboard-access-token:config name="Blackboard_Access_Token_Config" doc:name="Blackboard Access Token Config" doc:id="aa5d095c-b83d-46f8-b42f-415225051838" applicationKey="18af2425-b4f2-47ca-a773-e32a604e5f96" applicationSecret="YYR8NmhtHiHEX375cOYk0PqsQo7vPD6b">
+        <blackboard-access-token:unsecured-connection />
+    </blackboard-access-token:config>
+</mule>

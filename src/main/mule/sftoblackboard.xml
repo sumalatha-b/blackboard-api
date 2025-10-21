@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<flow name="sftoblackboardCreateFlow" doc:id="24798430-5f03-43c1-b316-c861ffddea72" >
+		<logger level="INFO" doc:name="Logger" doc:id="d5ab758d-2a7c-4c33-99ac-5a980a1a8f70" />
+		<flow-ref doc:name="blackboard-token-subFlow" doc:id="91f49bed-a5b8-4833-b632-6ea00a2d7d0b" name="blackboard-token-subFlow"/>
+	</flow>
+	<flow name="sftoblackboardUpdateFlow" doc:id="70818c34-3678-4429-a8b8-f013649f9909" >
+		<logger level="INFO" doc:name="Logger" doc:id="715336ed-e43d-4bea-b337-57761d5b1be4" />
+		<flow-ref doc:name="blackboard-token-subFlow" doc:id="2ee0e395-40d0-4b53-89c4-45b4559a22f3" name="blackboard-token-subFlow" />
+	</flow>
+	<flow name="sftoblackboardDeleteFlow" doc:id="96fe2b4a-3505-4c4f-b4d8-c1eecfc3e51a" >
+		<logger level="INFO" doc:name="Logger" doc:id="e6741b95-5916-4334-9ded-9a3422d397cf" />
+		<flow-ref doc:name="blackboard-token-subFlow" doc:id="712a9c36-0f12-4559-bdc7-3301515479f5" name="blackboard-token-subFlow" />
+	</flow>
+</mule>
