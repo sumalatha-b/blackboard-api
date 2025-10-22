@@ -6,9 +6,50 @@
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/blackboard-rest-lms http://www.mulesoft.org/schema/mule/blackboard-rest-lms/current/mule-blackboard-rest-lms.xsd">
+
 	<flow name="salesforceToBlackboardCreateTermsFlow" doc:id="24798430-5f03-43c1-b316-c861ffddea72" >
-		<logger level="INFO" doc:name="Logger" doc:id="d5ab758d-2a7c-4c33-99ac-5a980a1a8f70" />
+		<salesforce:new-object-listener doc:name="On New Object" doc:id="2d85adcd-ce00-4091-9491-c584f847e746" config-ref="Salesforce_Config" objectType="Blackboard_Term__c">
+			<scheduling-strategy >
+				<fixed-frequency frequency="1" timeUnit="MINUTES"/>
+			</scheduling-strategy>
+		</salesforce:new-object-listener>
+		<logger level="INFO" doc:name="Logger" doc:id="d5ab758d-2a7c-4c33-99ac-5a980a1a8f70" message="Salesforce to Blackboard Create Term Flow Started"/>
+		<logger level="INFO" doc:name="Logger" doc:id="9714a63e-97ee-4886-9e65-4d12e188cacd" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="0c0a5e9d-b8c9-495f-b7c4-441b115048c6">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    externalId: payload.External_ID__c as String default "",
+    dataSourceId: payload.Data_Source_ID__c as String default "",
+    name: payload.Name default "",
+    description: payload.Description__c default "",
+    availability: {
+        available: payload.Availability__c default "Yes",
+        duration: {
+            'type': payload.Duration_Type__c default "Continuous",
+            start: payload.Start_Date__c as String default "",
+            end: payload.End_Date__c as String default "",
+            daysOfUse: payload.Days_Of_Use__c as Number default 0
+        }
+    }
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 		<flow-ref doc:name="blackboard-token-subFlow" doc:id="91f49bed-a5b8-4833-b632-6ea00a2d7d0b" name="blackboard-token-subFlow"/>
+		<blackboard-rest-lms:post-v1-terms doc:name="Create Term" doc:id="860413ab-69cd-472a-bd22-1dee88a7f208" config-ref="Blackboard_Rest_Lms_Config"/>
+		<logger level="INFO" doc:name="Logger" doc:id="25dbe2ce-4381-4c24-82ac-e0ec7f41ccbc" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="77ed9fc7-dddd-4b34-b022-65d9393e10f5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="f3937f3f-9637-4c09-bf99-635112916db2" message="Salesforce to Blackboard Create Term Flow Ended"/>
 	</flow>
 	<flow name="salesforceToBlackboardUpdateTermsFlow" doc:id="70818c34-3678-4429-a8b8-f013649f9909" >
 		<salesforce:modified-object-listener doc:name="On Modified Object" doc:id="fc2d92bc-d1e5-492a-b710-dc32e90bd7f1" config-ref="Salesforce_Config" objectType="Blackboard_Term__c">
