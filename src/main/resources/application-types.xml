@@ -166,4 +166,5 @@ type: string]]></types:shape>
       </types:output-event>
     </types:processor-declaration>
   </types:enrichment>
+  <types:enrichment select="#0d0a7428-e9bb-40c9-b5d5-f987f405fd80"/>
 </types:mule>

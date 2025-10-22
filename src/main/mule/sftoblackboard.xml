@@ -94,7 +94,27 @@ payload.Term_ID__c]]></ee:set-variable>
 		<logger level="INFO" doc:name="Logger" doc:id="d1812b39-1b66-44d7-9d7e-c080df66ffaa" message="salesforceToBlackboardUpdateTermsFlowEnded"/>
 	</flow>
 	<flow name="salesforceToBlackboardDeleteTermsFlow" doc:id="96fe2b4a-3505-4c4f-b4d8-c1eecfc3e51a" >
-		<logger level="INFO" doc:name="Logger" doc:id="e6741b95-5916-4334-9ded-9a3422d397cf" />
+		<salesforce:deleted-object-listener doc:name="On Deleted Object" doc:id="a0277161-b25b-4d62-b4f7-a7bf06dab514" config-ref="Salesforce_Config" objectType="Blackboard_Term__c">
+			<scheduling-strategy >
+				<fixed-frequency frequency="1" timeUnit="MINUTES"/>
+			</scheduling-strategy>
+		</salesforce:deleted-object-listener>
+		<logger level="INFO" doc:name="Logger" doc:id="e6741b95-5916-4334-9ded-9a3422d397cf" message="salesforceToBlackboardDeleteTermsFlowStarted"/>
+		<logger level="INFO" doc:name="Logger" doc:id="2e5ac470-7ff8-44d0-9640-a99807be472e" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="0d0a7428-e9bb-40c9-b5d5-f987f405fd80" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="termId" ><![CDATA[%dw 2.0
+output application/json
+---
+payload.Term_ID__c]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="8e182f48-87e3-4646-be51-a7ba84e38f3e" message="#[payload]"/>
 		<flow-ref doc:name="blackboard-token-subFlow" doc:id="712a9c36-0f12-4559-bdc7-3301515479f5" name="blackboard-token-subFlow" />
+		<blackboard-rest-lms:delete-v1-terms-term-id doc:name="Delete Term" doc:id="ce1708e1-5979-4e25-9eef-d26c662dbf5e" config-ref="Blackboard_Rest_Lms_Config" termIdUriParam="#[vars.termId]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="62f074da-1291-4274-ab4c-1e0f08c65b88" message="#[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="8fd42cda-ec97-4eae-863f-c10e53d171b5" message="salesforceToBlackboardDeleteTermsFlowEnded"/>
 	</flow>
 </mule>
