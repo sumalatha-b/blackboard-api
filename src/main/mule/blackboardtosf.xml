@@ -16,7 +16,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 		<ee:transform doc:name="Transform Message" doc:id="feb9e7cb-6808-4824-b0ee-30e16fb2832e">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
-output application/java
+output application/json
 ---
 [{
 	Name: payload.name,
@@ -24,14 +24,15 @@ output application/java
 	External_ID__c: payload.externalId,
 	Data_Source_ID__c: payload.dataSourceId,
 	Description__c: payload.description,
-	Availability__c: payload.availability.available,
+	Availability_Status__c: payload.availability.available,
 	Duration_Type__c: payload.availability.duration."type" default "Continuous"
 			
 }]
 ]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<salesforce:upsert doc:name="Upsert" doc:id="f59a4e4e-f352-4c8e-b92a-3dbd9acb1c83" config-ref="Salesforce_Config" objectType="Blackboard_Term__c" externalIdFieldName="Term_ID__c"/>
+		<logger level="INFO" doc:name="Logger" doc:id="1b6a4bf2-3ce2-4668-a8d4-7d14c7cf8aae" message="#[payload]"/>
+		<salesforce:upsert doc:name="Upsert" doc:id="f59a4e4e-f352-4c8e-b92a-3dbd9acb1c83" config-ref="Salesforce_Config" objectType="Blackboard_Term__c" externalIdFieldName="Name"/>
 		<ee:transform doc:name="Transform Message" doc:id="19963d17-c84f-4464-934e-ea2f3d2ea43c" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0

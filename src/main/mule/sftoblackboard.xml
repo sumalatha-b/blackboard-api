@@ -75,7 +75,7 @@ output application/json
         "type": payload.Duration_Type__c,
         "start": payload.Start_Date__c,
         "end": payload.End_Date__c,
-        "daysOfUse": payload.Days_of_Use__c
+        "daysOfUse": payload.Days_of_Use__c as Number
       }
     }
   }]]></ee:set-payload>
