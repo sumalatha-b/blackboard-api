@@ -1,10 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:blackboard-rest-lms="http://www.mulesoft.org/schema/mule/blackboard-rest-lms" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/blackboard-rest-lms http://www.mulesoft.org/schema/mule/blackboard-rest-lms/current/mule-blackboard-rest-lms.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<flow name="blackboardToSalesforceCreateAndUpdateTermsFlow" doc:id="b58a9eea-c438-4167-98df-d8fd0a223a17" >
-		<logger level="INFO" doc:name="Logger" doc:id="383e892b-f7f1-4d53-8644-8601c62318e2" />
+		<http:listener doc:name="Listener" doc:id="95c966a6-b906-4714-a79c-aaa0a01d441a" config-ref="blackboard-rest-lms-httpListenerConfig" path="/backboard/terms/{termid}"/>
+		<logger level="INFO" doc:name="Logger" doc:id="383e892b-f7f1-4d53-8644-8601c62318e2" message="blackboardToSalesforceCreateAndUpdateTermsFlowStarted"/>
+		<flow-ref doc:name="Flow Reference" doc:id="c2bc7e80-dee1-43b6-8623-603447731502" name="blackboard-token-subFlow"/>
+		<blackboard-rest-lms:get-v1-terms-term-id doc:name="Get Terms By termId" doc:id="976ad56f-6fce-4ada-8cc4-0fa9086315f8" config-ref="Blackboard_Rest_Lms_Config" termIdUriParam="#[attributes.uriParams.termid]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="7444cfac-4840-439f-a3aa-f41f8fdeaa8e" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="feb9e7cb-6808-4824-b0ee-30e16fb2832e">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+[{
+	Name: payload.name,
+	Term_ID__c: payload.id,
+	External_ID__c: payload.externalId,
+	Data_Source_ID__c: payload.dataSourceId,
+	Description__c: payload.description,
+	Availability__c: payload.availability.available,
+	Duration_Type__c: payload.availability.duration."type" default "Continuous"
+			
+}]
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:upsert doc:name="Upsert" doc:id="f59a4e4e-f352-4c8e-b92a-3dbd9acb1c83" config-ref="Salesforce_Config" objectType="Blackboard_Term__c" externalIdFieldName="Term_ID__c"/>
+		<ee:transform doc:name="Transform Message" doc:id="19963d17-c84f-4464-934e-ea2f3d2ea43c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="af9d41dc-65a3-4685-8917-1e1037ae335f" message="#[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="fc1e162f-166a-4559-b7df-a6623f791c7a" message="blackboardToSalesforceCreateAndUpdateTermsFlowEnded"/>
 	</flow>
 	<flow name="blackboardToSalesforceDeleteTermsFlow" doc:id="1eea17b4-b25b-44ff-8e8b-65e631139fb2" >
 		<logger level="INFO" doc:name="Logger" doc:id="415815be-a400-481c-aa98-eae19fc10611" />
