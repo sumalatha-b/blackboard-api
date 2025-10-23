@@ -44,7 +44,58 @@ payload]]></ee:set-payload>
 		<logger level="INFO" doc:name="Logger" doc:id="af9d41dc-65a3-4685-8917-1e1037ae335f" message="#[payload]"/>
 		<logger level="INFO" doc:name="Logger" doc:id="fc1e162f-166a-4559-b7df-a6623f791c7a" message="blackboardToSalesforceCreateAndUpdateTermsFlowEnded"/>
 	</flow>
-	<flow name="blackboardToSalesforceDeleteTermsFlow" doc:id="1eea17b4-b25b-44ff-8e8b-65e631139fb2" >
-		<logger level="INFO" doc:name="Logger" doc:id="415815be-a400-481c-aa98-eae19fc10611" />
+	<flow name="blackboardToSalesforceDeleteTermsFlow" doc:id="53eb874f-3ed3-4b23-999a-3c700a8cefd2" >
+		<http:listener doc:name="Listener" doc:id="f73174e8-3529-45c8-b854-14a1c9ad0dc9" config-ref="blackboard-rest-lms-httpListenerConfig" path="/delete/backboard/terms/{termid}"/>
+		<logger level="INFO" doc:name="Logger" doc:id="4fcd76bd-fb7d-4c47-b465-81c38713a21a" message="Blackboard to Salesforce Delete Flow Started"/>
+		<logger level="INFO" doc:name="Logger" doc:id="1ef67c4a-705a-4300-b21a-94a9f84eebf2" message="#[%dw 2.0&#10;output application/json&#10;---&#10;payload]"/>
+		<flow-ref doc:name="Flow Reference" doc:id="a5ebcf55-a527-4224-bb25-2013d8147ab0" name="blackboard-token-subFlow"/>
+		<blackboard-rest-lms:get-v1-terms-term-id doc:name="Get Terms By termId" doc:id="36b1560c-1e0e-4114-b146-7671e5cc27fa" config-ref="Blackboard_Rest_Lms_Config" termIdUriParam="#[attributes.uriParams.termid]"/>
+		<ee:transform doc:name="sfRequestPayload" doc:id="4a4dd3d9-eb05-466e-8ce0-068448ac0043">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+[{
+	Name: payload.name
+			
+}]
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="edc487bf-bf76-4ba2-8808-f196a36df381" message="#[payload]" />
+		<salesforce:query doc:name="Query" doc:id="60bd41eb-2e82-4ee4-9654-311ae6c1a8f3" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query><![CDATA[select id, Name from Blackboard_Term__c where Name = :Name]]></salesforce:salesforce-query>
+			<salesforce:parameters><![CDATA[#[output application/java
+---
+{
+	Name : "'" ++ payload.Name[0] ++ "'"
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="a1635e80-4c9e-4648-892c-65cc18e9884c">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload.Id]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="2d9ac6ab-abfc-4678-a57c-605513f6e111">
+			<when expression="#[!isEmpty(payload)]">
+				<salesforce:delete doc:name="Delete" doc:id="78beb5e2-0ff3-4ce0-ada5-2b2815ea74ee" config-ref="Salesforce_Config" />
+				<ee:transform doc:name="Transform Message" doc:id="20f25e2a-e2f3-44b1-8388-6785ecf5f9df">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="Logger" doc:id="e8e06582-7a5c-4b18-adf3-4c9536a0ec6a" message="empty id's" />
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="d0492b56-84fc-4c8c-a0fd-d2918c8a87d5" message="#[payload]" />
+		<logger level="INFO" doc:name="Logger" doc:id="d177276b-ef6a-49da-819d-cbcea37d7366" message="Blackboard to Salesforce Delete Flow Ended" />
 	</flow>
 </mule>
